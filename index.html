@@ -1,1 +1,76 @@
-C:\Users\Fwz\Downloads\38833FF26BA1D.UnigramPreview_g9c9v27vpyspw!App\index.html
+let kx = b.vx - b2.vx;
+                        let ky = b.vy - b2.vy;
+                        let p = 2 * (nx * kx + ny * ky) / (b.mass + b2.mass);
+
+                        b.vx -= p * b2.mass * nx * elasticity;
+                        b.vy -= p * b2.mass * ny * elasticity;
+                        b2.vx += p * b.mass * nx * elasticity;
+                        b2.vy += p * b.mass * ny * elasticity;
+                    }
+                }
+
+                ctx.beginPath();
+                ctx.arc(b.x, b.y, b.radius, 0, Math.PI * 2);
+                ctx.fillStyle = b.color;
+                ctx.fill();
+            }
+        }
+
+        // --- الحلقة الرئيسية والتبديل ---
+        function switchLab(lab) {
+            currentLab = lab;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            resizeCanvas();
+
+            if (lab === 'gravity') initGravity();
+            if (lab === 'particles') initParticles();
+            if (lab === 'collisions') initCollisions();
+        }
+
+        function animate() {
+            if (currentLab === 'gravity') updateGravity();
+            else if (currentLab === 'particles') updateParticles();
+            else if (currentLab === 'collisions') updateCollisions();
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (currentLab !== 'gravity') return;
+            isDragging = true;
+            dragStart = {x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop};
+            dragCurrent = {...dragStart};
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                dragCurrent = {x: e.clientX - canvas.offsetLeft, y: e.clientY - canvas.offsetTop};
+            }
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            let launchX = dragStart.x - cx;
+            let launchY = dragStart.y - cy;
+            let vx = (dragStart.x - dragCurrent.x) * 0.05;
+            let vy = (dragStart.y - dragCurrent.y) * 0.05;
+
+            gravityObjects.push({
+                x: launchX, y: launchY,
+                vx: vx, vy: vy,
+                mass: 5, radius: 6,
+                color: '#38bdf8', trail: []
+            });
+        });
+
+        setTimeout(() => {
+            resizeCanvas();
+            initGravity();
+            animate();
+        }, 100);
+    </script>
+</body>
+</html>
